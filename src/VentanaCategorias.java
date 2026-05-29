@@ -3,7 +3,7 @@ import javax.swing.*;
 
 public class VentanaCategorias extends JFrame {
 
-    private static int contadorId;
+    private static int id_categoria;
 
     public VentanaCategorias() {
 
@@ -12,7 +12,7 @@ public class VentanaCategorias extends JFrame {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT NVL(MAX(ID_CATEGORIA), 1000) + 1 FROM CATEGORIA");
             if (rs.next()) {
-                contadorId = rs.getInt(1);
+                id_categoria = rs.getInt(1);
             }
             conn.close();
         } catch (SQLException e) {
@@ -65,12 +65,12 @@ public class VentanaCategorias extends JFrame {
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO CATEGORIA VALUES (" + contadorId + ", '" + nombre + "', '" + descripcion
+                    String sql = "INSERT INTO CATEGORIA VALUES (" + id_categoria + ", '" + nombre + "', '" + descripcion
                             + "')";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();
                     JOptionPane.showMessageDialog(dialog, "Categoría insertada correctamente.");
-                    contadorId++;
+                    id_categoria++;
                     dialog.dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
