@@ -14,7 +14,6 @@ public class VentanaProveedores extends JFrame{
         add(btnInsertar);
 
         btnInsertar.addActionListener(e -> {
-            new VentanaCategorias();
         });
 
         JButton btnActualizar = new JButton("Actualizar Datos");
