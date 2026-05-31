@@ -65,7 +65,7 @@ public class VentanaCategorias extends JFrame {
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO CATEGORIA VALUES (" + id_categoria + ", '" + nombre + "', '" + descripcion
+                    String sql = "INSERT INTO CATEGORIA (id_categoria, nombre, descripcion) VALUES (" + id_categoria + ", '" + nombre + "', '" + descripcion
                             + "')";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();

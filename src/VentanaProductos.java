@@ -105,7 +105,7 @@ public class VentanaProductos extends JFrame {
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO PRODUCTO VALUES (" + id_producto + ", '" + nombre + "', '" + descripcion + "', " + stock + "," + precio_venta + 
+                    String sql = "INSERT INTO PRODUCTO (id_producto, nombre, descripcion, stock, precio_venta, id_categoria) VALUES (" + id_producto + ", '" + nombre + "', '" + descripcion + "', " + stock + "," + precio_venta + 
                     ", (SELECT ID_CATEGORIA FROM CATEGORIA WHERE NOMBRE = '" + categoriaSeleccionada +"'))";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();

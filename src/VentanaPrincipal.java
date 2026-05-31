@@ -48,7 +48,7 @@ public class VentanaPrincipal extends JFrame {
         add(btnMovimientos);
 
         btnMovimientos.addActionListener(e -> {
-            new VentanaMovimientos();
+            new VentanaMovimientoInventario();
         });             
 
         setVisible(true);

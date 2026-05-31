@@ -83,7 +83,7 @@ public class VentanaProveedores extends JFrame{
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO PROVEEDOR VALUES (" + id_proveedor + ", '" + nombre + "', '" + telefono + "', '" + direccion + "','" + email + "')";
+                    String sql = "INSERT INTO PROVEEDOR (id_proveedor, nombre, telefono, direccion, email) VALUES (" + id_proveedor + ", '" + nombre + "', '" + telefono + "', '" + direccion + "','" + email + "')";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();
                     JOptionPane.showMessageDialog(dialog, "Proveedor insertado correctamente.");
