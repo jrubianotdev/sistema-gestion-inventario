@@ -5,13 +5,13 @@ public class VentanaPrincipal extends JFrame {
     public VentanaPrincipal() {
 
         setTitle("Gestión de Inventario");
-        setSize(400, 350);
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
         setLocationRelativeTo(null);
 
         JButton btnCategorias = new JButton("Categorías");
-        btnCategorias.setBounds(100, 50, 200, 30);
+        btnCategorias.setBounds(75, 50, 250, 30);
         add(btnCategorias);
 
         btnCategorias.addActionListener(e -> {
@@ -19,7 +19,7 @@ public class VentanaPrincipal extends JFrame {
         });
 
         JButton btnProductos = new JButton("Productos");
-        btnProductos.setBounds(100, 100, 200, 30);
+        btnProductos.setBounds(75, 100, 250, 30);
         add(btnProductos);
 
         btnProductos.addActionListener(e -> {
@@ -27,7 +27,7 @@ public class VentanaPrincipal extends JFrame {
         });
 
         JButton btnProveedores = new JButton("Proveedores");
-        btnProveedores.setBounds(100, 150, 200, 30);
+        btnProveedores.setBounds(75, 150, 250, 30);
         add(btnProveedores);
 
         btnProveedores.addActionListener(e -> {
@@ -36,7 +36,7 @@ public class VentanaPrincipal extends JFrame {
         });
 
         JButton btnTiposMovimiento = new JButton("Tipos de Movimiento");
-        btnTiposMovimiento.setBounds(100, 200, 200, 30);
+        btnTiposMovimiento.setBounds(75, 200, 250, 30);
         add(btnTiposMovimiento);
 
         btnTiposMovimiento.addActionListener(e -> {
@@ -44,12 +44,20 @@ public class VentanaPrincipal extends JFrame {
         });
         
         JButton btnMovimientos= new JButton("Movimientos");
-        btnMovimientos.setBounds(100, 250, 200, 30);
+        btnMovimientos.setBounds(75, 250, 250, 30);
         add(btnMovimientos);
 
         btnMovimientos.addActionListener(e -> {
             new VentanaMovimientoInventario();
         });             
+
+        JButton btnProductoProveedor= new JButton("Asignar Proveedor a Producto");
+        btnProductoProveedor.setBounds(75, 300, 250, 30);
+        add(btnProductoProveedor);
+
+        btnProductoProveedor.addActionListener(e -> {
+            new VentanaProductoProveedor();
+        });       
 
         setVisible(true);
 
