@@ -1,27 +1,13 @@
 import java.sql.*;
-import javax.swing.*;
-import java.time.*;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import javax.swing.*;
 
-public class VentanaMovimientoInventario extends JFrame {
+public class VentanaProductoProveedor extends JFrame{
 
-    private static int id_movimiento;
+    public VentanaProductoProveedor() {
 
-    public VentanaMovimientoInventario() {
-
-        try {
-            Connection conn = ConexionDB.getConexion();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT NVL(MAX(ID_MOVIMIENTO), 5000) + 1 FROM MOVIMIENTO_INVENTARIO");
-            if (rs.next()) {
-                id_movimiento = rs.getInt(1);
-            }
-            conn.close();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error al conectar: " + e.getMessage());
-        }
-
-        setTitle("Movimientos");
+        setTitle("Asignar Proveedor a Producto");
         setSize(400, 350);
         setLayout(null);
         setLocationRelativeTo(null);
@@ -31,7 +17,7 @@ public class VentanaMovimientoInventario extends JFrame {
         add(btnInsertar);
 
         btnInsertar.addActionListener(e -> {
-            JDialog dialog = new JDialog(this, "Insertar Movimiento", true);
+            JDialog dialog = new JDialog(this, "Asignar Proveedor a Producto", true);
             dialog.setSize(350, 350);
             dialog.setLayout(null);
             dialog.setLocationRelativeTo(this);
@@ -57,26 +43,26 @@ public class VentanaMovimientoInventario extends JFrame {
             cmbIdProducto.setBounds(120, 20, 180, 25);
             dialog.add(cmbIdProducto);
 
-            JComboBox<String> cmbIdTipoMov = new JComboBox<>();
+            JComboBox<String> cmbIdProveedor= new JComboBox<>();
 
             try {
                 Connection conn = ConexionDB.getConexion();
                 Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT DESCRIPCION FROM TIPO_MOVIMIENTO");
+                ResultSet rs = stmt.executeQuery("SELECT NOMBRE FROM PROVEEDOR");
                 while (rs.next()) {
-                    cmbIdTipoMov.addItem(rs.getString("DESCRIPCION"));
+                    cmbIdProveedor.addItem(rs.getString("NOMBRE"));
                 }
                 conn.close();
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(this, "Error al conectar: " + ex.getMessage());
             }
 
-            JLabel lblIdTipoMov = new JLabel("Tipo Mov:");
-            lblIdTipoMov.setBounds(20, 60, 100, 25);
-            dialog.add(lblIdTipoMov);
+            JLabel lblIdProveedor = new JLabel("Proveedor:");
+            lblIdProveedor.setBounds(20, 60, 100, 25);
+            dialog.add(lblIdProveedor);
 
-            cmbIdTipoMov.setBounds(120, 60, 180, 25);
-            dialog.add(cmbIdTipoMov);
+            cmbIdProveedor.setBounds(120, 60, 180, 25);
+            dialog.add(cmbIdProveedor);
 
             LocalDateTime fechaHoraActual = LocalDateTime.now();
             DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -90,13 +76,13 @@ public class VentanaMovimientoInventario extends JFrame {
             txtCantidad.setBounds(120, 100, 180, 25);
             dialog.add(txtCantidad);
 
-            JLabel lblDescripcion = new JLabel("Descripcion:");
-            lblDescripcion.setBounds(20, 140, 100, 25);
-            dialog.add(lblDescripcion);
+            JLabel lblPrecioCompra = new JLabel("Precio Compra:");
+            lblPrecioCompra.setBounds(20, 140, 100, 25);
+            dialog.add(lblPrecioCompra);
 
-            JTextField txtDescripcion = new JTextField();
-            txtDescripcion.setBounds(120, 140, 180, 25);
-            dialog.add(txtDescripcion);
+            JTextField txtPrecioCompra = new JTextField();
+            txtPrecioCompra.setBounds(120, 140, 180, 25);
+            dialog.add(txtPrecioCompra);
 
             JButton btnGuardar = new JButton("Guardar");
             btnGuardar.setBounds(100, 180, 120, 30);
@@ -105,40 +91,31 @@ public class VentanaMovimientoInventario extends JFrame {
             btnGuardar.addActionListener(ev -> {
 
                 String nombreProducto = (String) cmbIdProducto.getSelectedItem();
-                String descripcionMovimiento = (String) cmbIdTipoMov.getSelectedItem();
+                String nombreProveedor = (String) cmbIdProveedor.getSelectedItem();
+                String precio_compra = txtPrecioCompra.getText().trim();
                 String fecha = fechaFormateada;
                 String cantidad = txtCantidad.getText().trim();
-                try {
-                    Integer.parseInt(cantidad);
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "La cantidad debe ser numérica.");
-                    return;
-                }
-                String descripcion = txtDescripcion.getText().trim();
+                
 
-                if (nombreProducto == null || descripcionMovimiento == null || cantidad.isEmpty()
-                        || descripcion.isEmpty()) {
+                if (nombreProducto.isEmpty() || nombreProveedor.isEmpty() || precio_compra.isEmpty() || fecha.isEmpty()
+                        || cantidad.isEmpty()) {
                     JOptionPane.showMessageDialog(dialog, "Todos los campos son obligatorios.");
                     return;
                 }
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO MOVIMIENTO_INVENTARIO " +
-                            "(id_movimiento,id_producto,id_tipo_mov,fecha,cantidad,descripcion) " +
-                            "VALUES(" +
-                            id_movimiento +
-                            ",(SELECT ID_PRODUCTO FROM PRODUCTO WHERE NOMBRE = '" + nombreProducto + "')" +
-                            ",(SELECT ID_TIPO_MOV FROM TIPO_MOVIMIENTO WHERE DESCRIPCION = '" + descripcionMovimiento
-                            + "')" +
+                    String sql = "INSERT INTO PRODUCTO_PROVEEDOR " +
+                            "(id_producto,id_proveedor,precio_compra,fecha,cantidad) " +
+                            "VALUES("+
+                            "(SELECT ID_PRODUCTO FROM PRODUCTO WHERE NOMBRE = '" + nombreProducto + "')" +
+                            ",(SELECT ID_PROVEEDOR FROM PROVEEDOR WHERE NOMBRE= '" + nombreProveedor + "')" +
+                            "," + precio_compra +
                             ",TO_DATE('" + fecha + "','YYYY-MM-DD HH24:MI:SS')" +
-                            "," + cantidad +
-                            ",'" + descripcion + "')";
-
+                            "," + cantidad + ")";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();
-                    JOptionPane.showMessageDialog(dialog, "Movimiento insertado correctamente.");
-                    id_movimiento++;
+                    JOptionPane.showMessageDialog(dialog, "Provedor asignado correctamente al Producto.");
                     dialog.dispose();
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
