@@ -70,7 +70,7 @@ public class VentanaTiposMovimientos extends JFrame{
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO TIPO_MOVIMIENTO VALUES (" + id_tipo_mov + ", '" + operacionSeleccionada + "', '" + descripcion + "')";
+                    String sql = "INSERT INTO TIPO_MOVIMIENTO (id_tipo_mov, operacion, descripcion) VALUES (" + id_tipo_mov + ", '" + operacionSeleccionada + "', '" + descripcion + "')";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();
                     JOptionPane.showMessageDialog(dialog, "Tipo de Movimiento insertado correctamente.");
