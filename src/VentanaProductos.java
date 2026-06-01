@@ -17,7 +17,7 @@ public class VentanaProductos extends JFrame {
             conn.close();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al conectar: " + e.getMessage());
-        } 
+        }
 
         setTitle("Productos");
         setSize(400, 350);
@@ -67,7 +67,7 @@ public class VentanaProductos extends JFrame {
             dialog.add(txtPrecioVenta);
 
             JComboBox<String> cmbCategoria = new JComboBox<>();
-            
+
             try {
                 Connection conn = ConexionDB.getConexion();
                 Statement stmt = conn.createStatement();
@@ -98,15 +98,17 @@ public class VentanaProductos extends JFrame {
                 String precio_venta = txtPrecioVenta.getText().trim();
                 String categoriaSeleccionada = (String) cmbCategoria.getSelectedItem();
 
-                if (nombre.isEmpty() || descripcion.isEmpty() || stock.isEmpty() || precio_venta.isEmpty() || categoriaSeleccionada.isEmpty()) {
+                if (nombre.isEmpty() || descripcion.isEmpty() || stock.isEmpty() || precio_venta.isEmpty()
+                        || categoriaSeleccionada.isEmpty()) {
                     JOptionPane.showMessageDialog(dialog, "No pueden haber campos vacíos");
                     return;
                 }
 
                 try {
                     Connection conn = ConexionDB.getConexion();
-                    String sql = "INSERT INTO PRODUCTO (id_producto, nombre, descripcion, stock, precio_venta, id_categoria) VALUES (" + id_producto + ", '" + nombre + "', '" + descripcion + "', " + stock + "," + precio_venta + 
-                    ", (SELECT ID_CATEGORIA FROM CATEGORIA WHERE NOMBRE = '" + categoriaSeleccionada +"'))";
+                    String sql = "INSERT INTO PRODUCTO (id_producto, nombre, descripcion, stock, precio_venta, id_categoria) VALUES ("
+                            + id_producto + ", '" + nombre + "', '" + descripcion + "', " + stock + "," + precio_venta +
+                            ", (SELECT ID_CATEGORIA FROM CATEGORIA WHERE NOMBRE = '" + categoriaSeleccionada + "'))";
                     conn.createStatement().executeUpdate(sql);
                     conn.close();
                     JOptionPane.showMessageDialog(dialog, "Producto insertado correctamente.");
@@ -125,6 +127,92 @@ public class VentanaProductos extends JFrame {
         add(btnActualizar);
 
         btnActualizar.addActionListener(e -> {
+
+            JDialog dialog = new JDialog(this, "Actualizar Producto", true);
+            dialog.setSize(400, 350);
+            dialog.setLayout(null);
+            dialog.setLocationRelativeTo(this);
+
+            JLabel lblProducto = new JLabel("Producto:");
+            lblProducto.setBounds(20, 20, 100, 25);
+            dialog.add(lblProducto);
+
+            JComboBox<String> cmbProducto = new JComboBox<>();
+            cmbProducto.setBounds(120, 20, 220, 25);
+            dialog.add(cmbProducto);
+
+            JLabel lblNombre = new JLabel("Nuevo nombre:");
+            lblNombre.setBounds(20, 60, 120, 25);
+            dialog.add(lblNombre);
+
+            JTextField txtNombre = new JTextField();
+            txtNombre.setBounds(120, 60, 220, 25);
+            dialog.add(txtNombre);
+
+            JLabel lblStock = new JLabel("Nuevo stock:");
+            lblStock.setBounds(20, 100, 120, 25);
+            dialog.add(lblStock);
+
+            JTextField txtStock = new JTextField();
+            txtStock.setBounds(120, 100, 220, 25);
+            dialog.add(txtStock);
+
+            try {
+
+                Connection conn = ConexionDB.getConexion();
+                Statement stmt = conn.createStatement();
+
+                ResultSet rs = stmt.executeQuery("SELECT nombre FROM producto");
+
+                while (rs.next()) {
+                    cmbProducto.addItem(rs.getString("nombre"));
+                }
+
+                conn.close();
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage());
+            }
+
+            JButton btnActualizarFinal = new JButton("Actualizar");
+            btnActualizarFinal.setBounds(120, 180, 120, 30);
+            dialog.add(btnActualizarFinal);
+
+            btnActualizarFinal.addActionListener(ev -> {
+
+                String producto = (String) cmbProducto.getSelectedItem();
+                String nuevoNombre = txtNombre.getText().trim();
+                String nuevoStock = txtStock.getText().trim();
+
+                if (nuevoNombre.isEmpty() || nuevoStock.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "No puede haber campos vacíos");
+                    return;
+                }
+
+                try {
+
+                    Connection conn = ConexionDB.getConexion();
+
+                    String sql = "UPDATE PRODUCTO SET nombre='" + nuevoNombre +
+                            "', stock=" + nuevoStock +
+                            " WHERE nombre='" + producto + "'";
+
+                    int filas = conn.createStatement().executeUpdate(sql);
+
+                    conn.close();
+
+                    if (filas > 0) {
+                        JOptionPane.showMessageDialog(dialog, "Producto actualizado");
+                        dialog.dispose();
+                    }
+
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                }
+
+            });
+
+            dialog.setVisible(true);
         });
 
         JButton btnEliminar = new JButton("Eliminar Datos");
@@ -133,6 +221,75 @@ public class VentanaProductos extends JFrame {
 
         btnEliminar.addActionListener(e -> {
 
+            JDialog dialog = new JDialog(this, "Eliminar Producto", true);
+            dialog.setSize(350, 200);
+            dialog.setLayout(null);
+            dialog.setLocationRelativeTo(this);
+
+            JLabel lblProducto = new JLabel("Producto:");
+            lblProducto.setBounds(20, 30, 100, 25);
+            dialog.add(lblProducto);
+
+            JComboBox<String> cmbProducto = new JComboBox<>();
+            cmbProducto.setBounds(120, 30, 180, 25);
+            dialog.add(cmbProducto);
+
+            try {
+
+                Connection conn = ConexionDB.getConexion();
+                Statement stmt = conn.createStatement();
+
+                ResultSet rs = stmt.executeQuery("SELECT nombre FROM producto");
+
+                while (rs.next()) {
+                    cmbProducto.addItem(rs.getString("nombre"));
+                }
+
+                conn.close();
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage());
+            }
+
+            JButton btnEliminarFinal = new JButton("Eliminar");
+            btnEliminarFinal.setBounds(100, 90, 120, 30);
+            dialog.add(btnEliminarFinal);
+
+            btnEliminarFinal.addActionListener(ev -> {
+
+                String producto = (String) cmbProducto.getSelectedItem();
+
+                int respuesta = JOptionPane.showConfirmDialog(
+                        dialog,
+                        "¿Eliminar producto?",
+                        "Confirmación",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (respuesta == JOptionPane.YES_OPTION) {
+
+                    try {
+
+                        Connection conn = ConexionDB.getConexion();
+
+                        String sql = "DELETE FROM PRODUCTO WHERE nombre='" + producto + "'";
+
+                        int filas = conn.createStatement().executeUpdate(sql);
+
+                        conn.close();
+
+                        if (filas > 0) {
+                            JOptionPane.showMessageDialog(dialog, "Producto eliminado");
+                            dialog.dispose();
+                        }
+
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                    }
+                }
+
+            });
+
+            dialog.setVisible(true);
         });
 
         JButton btnConsultar = new JButton("Consultar Información");
