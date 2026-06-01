@@ -153,6 +153,103 @@ public class VentanaMovimientoInventario extends JFrame {
         add(btnActualizar);
 
         btnActualizar.addActionListener(e -> {
+
+            JDialog dialog = new JDialog(this, "Actualizar Movimiento", true);
+            dialog.setSize(420, 380);
+            dialog.setLayout(null);
+            dialog.setLocationRelativeTo(this);
+
+            JLabel lblMovimiento = new JLabel("Movimiento:");
+            lblMovimiento.setBounds(20, 20, 100, 25);
+            dialog.add(lblMovimiento);
+
+            JComboBox<String> cmbMovimiento = new JComboBox<>();
+            cmbMovimiento.setBounds(120, 20, 240, 25);
+            dialog.add(cmbMovimiento);
+
+            JLabel lblCantidad = new JLabel("Cantidad:");
+            lblCantidad.setBounds(20, 70, 100, 25);
+            dialog.add(lblCantidad);
+
+            JTextField txtCantidad = new JTextField();
+            txtCantidad.setBounds(120, 70, 240, 25);
+            dialog.add(txtCantidad);
+
+            JLabel lblDescripcion = new JLabel("Descripción:");
+            lblDescripcion.setBounds(20, 110, 100, 25);
+            dialog.add(lblDescripcion);
+
+            JTextField txtDescripcion = new JTextField();
+            txtDescripcion.setBounds(120, 110, 240, 25);
+            dialog.add(txtDescripcion);
+
+            try {
+
+                Connection conn = ConexionDB.getConexion();
+                Statement stmt = conn.createStatement();
+
+                ResultSet rs = stmt.executeQuery(
+                        "SELECT descripcion FROM MOVIMIENTO_INVENTARIO");
+
+                while (rs.next()) {
+                    cmbMovimiento.addItem(rs.getString("descripcion"));
+                }
+
+                conn.close();
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage());
+            }
+
+            JButton btnActualizarFinal = new JButton("Actualizar");
+            btnActualizarFinal.setBounds(140, 170, 120, 30);
+            dialog.add(btnActualizarFinal);
+
+            btnActualizarFinal.addActionListener(ev -> {
+
+                String movimiento = (String) cmbMovimiento.getSelectedItem();
+                String cantidad = txtCantidad.getText().trim();
+                String descripcion = txtDescripcion.getText().trim();
+
+                if (cantidad.isEmpty() || descripcion.isEmpty()) {
+                    JOptionPane.showMessageDialog(dialog, "No pueden haber campos vacíos");
+                    return;
+                }
+
+                try {
+
+                    Integer.parseInt(cantidad);
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(dialog, "La cantidad debe ser numérica");
+                    return;
+                }
+
+                try {
+
+                    Connection conn = ConexionDB.getConexion();
+
+                    String sql = "UPDATE MOVIMIENTO_INVENTARIO SET " +
+                            "cantidad=" + cantidad + ", " +
+                            "descripcion='" + descripcion + "' " +
+                            "WHERE descripcion='" + movimiento + "'";
+
+                    int filas = conn.createStatement().executeUpdate(sql);
+
+                    conn.close();
+
+                    if (filas > 0) {
+                        JOptionPane.showMessageDialog(dialog, "Movimiento actualizado");
+                        dialog.dispose();
+                    }
+
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                }
+
+            });
+
+            dialog.setVisible(true);
         });
 
         JButton btnEliminar = new JButton("Eliminar Datos");
@@ -161,6 +258,77 @@ public class VentanaMovimientoInventario extends JFrame {
 
         btnEliminar.addActionListener(e -> {
 
+            JDialog dialog = new JDialog(this, "Eliminar Movimiento", true);
+            dialog.setSize(380, 220);
+            dialog.setLayout(null);
+            dialog.setLocationRelativeTo(this);
+
+            JLabel lblMovimiento = new JLabel("Movimiento:");
+            lblMovimiento.setBounds(20, 30, 100, 25);
+            dialog.add(lblMovimiento);
+
+            JComboBox<String> cmbMovimiento = new JComboBox<>();
+            cmbMovimiento.setBounds(120, 30, 220, 25);
+            dialog.add(cmbMovimiento);
+
+            try {
+
+                Connection conn = ConexionDB.getConexion();
+                Statement stmt = conn.createStatement();
+
+                ResultSet rs = stmt.executeQuery(
+                        "SELECT descripcion FROM MOVIMIENTO_INVENTARIO");
+
+                while (rs.next()) {
+                    cmbMovimiento.addItem(rs.getString("descripcion"));
+                }
+
+                conn.close();
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, ex.getMessage());
+            }
+
+            JButton btnEliminarFinal = new JButton("Eliminar");
+            btnEliminarFinal.setBounds(130, 90, 120, 30);
+            dialog.add(btnEliminarFinal);
+
+            btnEliminarFinal.addActionListener(ev -> {
+
+                String movimiento = (String) cmbMovimiento.getSelectedItem();
+
+                int respuesta = JOptionPane.showConfirmDialog(
+                        dialog,
+                        "¿Eliminar movimiento?",
+                        "Confirmación",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (respuesta == JOptionPane.YES_OPTION) {
+
+                    try {
+
+                        Connection conn = ConexionDB.getConexion();
+
+                        String sql = "DELETE FROM MOVIMIENTO_INVENTARIO WHERE descripcion='" + movimiento + "'";
+
+                        int filas = conn.createStatement().executeUpdate(sql);
+
+                        conn.close();
+
+                        if (filas > 0) {
+                            JOptionPane.showMessageDialog(dialog, "Movimiento eliminado");
+                            dialog.dispose();
+                        }
+
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(dialog, "Error: " + ex.getMessage());
+                    }
+
+                }
+
+            });
+
+            dialog.setVisible(true);
         });
 
         JButton btnConsultar = new JButton("Consultar Información");
